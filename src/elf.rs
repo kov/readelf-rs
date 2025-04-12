@@ -4,6 +4,8 @@ use std::fmt;
 use std::fs::File;
 use std::path::Path;
 
+use crate::emachine::EMachine;
+
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ElfIdent {
@@ -16,12 +18,31 @@ pub struct ElfIdent {
     pub padding: [u8; 7],
 }
 
+#[repr(transparent)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct ElfType(pub u16);
+
+impl fmt::Display for ElfType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.0 {
+            0 => write!(f, "NONE (None)"),
+            1 => write!(f, "REL (Relocatable file)"),
+            2 => write!(f, "EXEC (Executable file)"),
+            3 => write!(f, "DYN (FIXME)"),
+            4 => write!(f, "CORE (Core file)"),
+            0xfe00..=0xfeff => write!(f, "OS Specific: ({:#x})", self.0),
+            0xff00..=0xffff => write!(f, "Processor Specific: ({:#x})", self.0),
+            _ => write!(f, "<unknown>: {:#x}", self.0),
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Elf64Header {
     pub e_ident: ElfIdent,
-    pub e_type: u16,
-    pub e_machine: u16,
+    pub e_type: ElfType,
+    pub e_machine: EMachine,
     pub e_version: u32,
     pub e_entry: u64,
     pub e_phoff: u64,
@@ -39,8 +60,8 @@ pub struct Elf64Header {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Elf32Header {
     pub e_ident: ElfIdent,
-    pub e_type: u16,
-    pub e_machine: u16,
+    pub e_type: ElfType,
+    pub e_machine: EMachine,
     pub e_version: u32,
     pub e_entry: u32,
     pub e_phoff: u32,

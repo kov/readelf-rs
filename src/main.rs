@@ -2,6 +2,7 @@ use clap::{Arg, Command};
 use elf::ElfFile;
 
 mod elf;
+mod emachine;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = Command::new("readelf-rs")
