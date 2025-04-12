@@ -1,0 +1,9 @@
+[package]
+name = "readelf-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+memmap2 = "0.9"
+anyhow = "1.0"
